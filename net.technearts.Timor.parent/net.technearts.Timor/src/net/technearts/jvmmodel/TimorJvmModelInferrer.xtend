@@ -6,6 +6,7 @@ package net.technearts.jvmmodel
 import com.google.inject.Inject
 import net.technearts.timor.ClassDeclaration
 import net.technearts.timor.File
+import net.technearts.timor.MethodDeclaration
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
@@ -13,7 +14,7 @@ import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
- *
+ * 
  * <p>The JVM model should contain all elements that would appear in the Java code 
  * which is generated from the source model. Other models link against the JVM model rather than the source model.</p>     
  */
@@ -25,27 +26,37 @@ class TimorJvmModelInferrer extends AbstractModelInferrer {
 	@Inject extension JvmTypesBuilder
 	@Inject extension IQualifiedNameProvider
 
-		def dispatch void infer(File file, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
-		System.out.println("-------------------1" + file.fullyQualifiedName)
-		for (klazz : file.declarations) {
-			System.out.println("-------------------2" + klazz.toString)
-			if (klazz instanceof ClassDeclaration) {
-				System.out.println("-------------------3")
-				acceptor.accept(klazz.toClass(klazz.fullyQualifiedName)) [
-					System.out.println("-------------------4")
-					documentation = klazz.documentation
-					if (klazz.extend != null)
-						// TODO está pegando o primeiro elemento como classe
-						superTypes += klazz.extend.get(0).cloneWithProxies
-					for (property : klazz.properties) {
-						members += property.toField(property.name, property.type)
-						members += property.toSetter(property.name, property.type)
-						members += property.toGetter(property.name, property.type)
-					}
-				]
-
+	def dispatch void infer(File file, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+		for (declaration : file.declarations) {
+			switch declaration {
+				ClassDeclaration: {
+					acceptor.accept(declaration.toClass(declaration.fullyQualifiedName)) [
+						documentation = declaration.documentation
+						if (declaration.extend != null && declaration.extend.size > 0) {
+							// TODO está pegando o primeiro elemento como classe
+							superTypes += declaration.extend.get(0).cloneWithProxies
+						}
+						for (property : declaration.properties) {
+							members += property.toField(property.name, property.type)
+							members += property.toSetter(property.name, property.type)
+							members += property.toGetter(property.name, property.type)
+						}
+					]
+				}
+				MethodDeclaration: {
+					acceptor.accept(declaration.target.toClass(declaration.fullyQualifiedName)) [
+					members += declaration.toMethod(declaration.name, declaration.type) [
+              		documentation = feature.documentation
+              		for (p : feature.params) {
+                		parameters += p.toParameter(p.name, p.parameterType)
+              		}
+              		body = feature.body
+              		
+              		]
+				}
 			}
 
 		}
+
 	}
 }
