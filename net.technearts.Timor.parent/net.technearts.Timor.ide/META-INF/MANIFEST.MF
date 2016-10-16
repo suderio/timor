@@ -10,5 +10,6 @@ Require-Bundle: net.technearts.Timor,
  org.eclipse.xtext.xbase.ide
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: net.technearts.ide.contentassist.antlr.internal,
- net.technearts.ide.contentassist.antlr
+ net.technearts.ide.contentassist.antlr,
+ net.technearts.ide.contentassist.antlr.lexer
 

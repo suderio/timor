@@ -27,5 +27,6 @@ Export-Package: net.technearts.timor.impl,
  net.technearts.services,
  net.technearts.timor,
  net.technearts.scoping,
- net.technearts.timor.util
+ net.technearts.timor.util,
+ net.technearts.parser.antlr.lexer
 Import-Package: org.apache.log4j

@@ -4,9 +4,10 @@ generate timor "http://www.technearts.net/Timor"
 
 File:
 	imports=XImportSection?
-	'package' name=Xtype::QualifiedName '{'	
-	declarations+=(MethodDeclaration | ClassDeclaration)*
-	'}';
+	'package' name=Xtype::QualifiedName 
+	(BEGIN	
+	(declarations+=(MethodDeclaration | ClassDeclaration))*
+	END)?;
 
 MethodDeclaration:
 	type=JvmTypeReference 
@@ -23,4 +24,5 @@ ClassDeclaration:
 Property:
     name=ValidID ':' type=JvmTypeReference;
 
-
+terminal BEGIN: 'synthetic:BEGIN';  // increase indentation
+terminal END: 'synthetic:END';      // decrease indentation
