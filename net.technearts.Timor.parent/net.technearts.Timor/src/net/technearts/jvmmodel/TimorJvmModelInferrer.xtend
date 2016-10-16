@@ -4,9 +4,12 @@
 package net.technearts.jvmmodel
 
 import com.google.inject.Inject
+import java.util.HashMap
 import net.technearts.timor.ClassDeclaration
 import net.technearts.timor.File
 import net.technearts.timor.MethodDeclaration
+import org.eclipse.xtext.common.types.JvmGenericType
+import org.eclipse.xtext.common.types.JvmOperation
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
@@ -27,6 +30,20 @@ class TimorJvmModelInferrer extends AbstractModelInferrer {
 	@Inject extension IQualifiedNameProvider
 
 	def dispatch void infer(File file, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+		val ops = new HashMap<JvmOperation, JvmGenericType>();
+		for (declaration : file.declarations) {
+			switch declaration {
+				MethodDeclaration: {
+					ops.put( declaration.toMethod(declaration.methodName, declaration.type) [
+						documentation = declaration.documentation
+						for (p : declaration.params) {
+							parameters += p.toParameter(p.name, p.parameterType)
+						}
+						body = declaration.body
+					], declaration.toClass(declaration.fullyQualifiedName))
+				}
+			}
+		}
 		for (declaration : file.declarations) {
 			switch declaration {
 				ClassDeclaration: {
@@ -41,22 +58,14 @@ class TimorJvmModelInferrer extends AbstractModelInferrer {
 							members += property.toSetter(property.name, property.type)
 							members += property.toGetter(property.name, property.type)
 						}
+						for (entry : ops.entrySet) {
+							if (entry.value.fullyQualifiedName.equals(declaration.fullyQualifiedName)){
+								members += entry.key
+							}
+						}
 					]
 				}
-				MethodDeclaration: {
-					acceptor.accept(declaration.target.toClass(declaration.fullyQualifiedName)) [
-					members += declaration.toMethod(declaration.name, declaration.type) [
-              		documentation = feature.documentation
-              		for (p : feature.params) {
-                		parameters += p.toParameter(p.name, p.parameterType)
-              		}
-              		body = feature.body
-              		
-              		]
-				}
 			}
-
 		}
-
 	}
 }

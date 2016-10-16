@@ -9,17 +9,16 @@ File:
 	'}';
 
 MethodDeclaration:
-	type=JvmTypeParameter 
-	name=ValidID 
-	'('(target=FullJvmFormalParameter 
+	type=JvmTypeReference 
+	methodName=ValidID 
+	'('(name=ValidID this=ValidID
 		(',' params+=FullJvmFormalParameter)*)')' 
-	block=XBlockExpression;
-
-Args:
-	argType=JvmTypeParameter name=ValidID;
+	body=XBlockExpression;
 
 ClassDeclaration:
-	name=ValidID ('is' extend+=(JvmTypeReference)+)? '{' properties+=(Property)* '}';
+	name=ValidID 
+	('is' extend+=(JvmTypeReference)+)? 
+	'{' properties+=(Property)* '}';
 
 Property:
     name=ValidID ':' type=JvmTypeReference;
