@@ -4,25 +4,47 @@ generate timor "http://www.technearts.net/Timor"
 
 File:
 	imports=XImportSection?
-	'package' name=Xtype::QualifiedName 
-	(BEGIN	
-	(declarations+=(MethodDeclaration | ClassDeclaration))*
+	'package' name=Xtype::QualifiedName
+	(BEGIN
+		(declarations+=(MethodDeclaration | ClassDeclaration))+
 	END)?;
 
-MethodDeclaration:
-	type=JvmTypeReference 
-	methodName=ValidID 
-	'('(name=ValidID this=ValidID
-		(',' params+=FullJvmFormalParameter)*)')' 
-	body=XBlockExpression;
+Declaration:
+	ClassDeclaration | MethodDeclaration | PropertyDeclaration;
 
 ClassDeclaration:
-	name=ValidID 
-	('is' extend+=(JvmTypeReference)+)? 
-	'{' properties+=(Property)* '}';
+	{ClassDeclaration}
+	klazz=(Class);
+
+Class:
+	name=ValidID
+	('is' extend+=(JvmTypeReference)+)?
+	'{' 
+		(properties+=(PropertyDeclaration))+
+	 '}';
+
+MethodDeclaration:
+	{MethodDeclaration}
+	method=(Method);
+
+Method:
+	type=JvmTypeReference
+	methodName=ValidID
+	'(' (name=ValidID scope=SCOPE
+	(',' params+=FullJvmFormalParameter)*) ')'
+	body=XBlockExpression;
+
+PropertyDeclaration:
+	{PropertyDeclaration}
+	property=(Property);
 
 Property:
-    name=ValidID ':' type=JvmTypeReference;
+	name=ValidID ':' type=JvmTypeReference;
 
-terminal BEGIN: 'synthetic:BEGIN';  // increase indentation
-terminal END: 'synthetic:END';      // decrease indentation
+terminal SCOPE:
+	'self' | 'type';
+
+terminal BEGIN:
+	'synthetic:BEGIN'; // increase indentation
+terminal END:
+	'synthetic:END'; // decrease indentation

@@ -11,18 +11,28 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//File/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//File/declarations"/>
     </genClasses>
-    <genClasses ecoreClass="Timor.ecore#//MethodDeclaration">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//MethodDeclaration/type"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//MethodDeclaration/methodName"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//MethodDeclaration/name"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//MethodDeclaration/this"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//MethodDeclaration/params"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//MethodDeclaration/body"/>
-    </genClasses>
+    <genClasses ecoreClass="Timor.ecore#//Declaration"/>
     <genClasses ecoreClass="Timor.ecore#//ClassDeclaration">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//ClassDeclaration/name"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//ClassDeclaration/extend"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//ClassDeclaration/properties"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//ClassDeclaration/klazz"/>
+    </genClasses>
+    <genClasses ecoreClass="Timor.ecore#//Class">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//Class/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//Class/extend"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//Class/properties"/>
+    </genClasses>
+    <genClasses ecoreClass="Timor.ecore#//MethodDeclaration">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//MethodDeclaration/method"/>
+    </genClasses>
+    <genClasses ecoreClass="Timor.ecore#//Method">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//Method/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//Method/methodName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//Method/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//Method/scope"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//Method/params"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//Method/body"/>
+    </genClasses>
+    <genClasses ecoreClass="Timor.ecore#//PropertyDeclaration">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Timor.ecore#//PropertyDeclaration/property"/>
     </genClasses>
     <genClasses ecoreClass="Timor.ecore#//Property">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Timor.ecore#//Property/name"/>

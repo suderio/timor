@@ -34,32 +34,33 @@ class TimorJvmModelInferrer extends AbstractModelInferrer {
 		for (declaration : file.declarations) {
 			switch declaration {
 				MethodDeclaration: {
-					ops.put( declaration.toMethod(declaration.methodName, declaration.type) [
+					ops.put( declaration.toMethod(declaration.method.methodName, declaration.method.type) [
 						documentation = declaration.documentation
-						for (p : declaration.params) {
+						static = declaration.method.scope == 'type'
+						for (p : declaration.method.params) {
 							parameters += p.toParameter(p.name, p.parameterType)
 						}
-						body = declaration.body
-					], declaration.toClass(declaration.fullyQualifiedName))
+						body = declaration.method.body
+					], declaration.method.toClass(declaration.method.fullyQualifiedName))
 				}
 			}
 		}
 		for (declaration : file.declarations) {
 			switch declaration {
 				ClassDeclaration: {
-					acceptor.accept(declaration.toClass(declaration.fullyQualifiedName)) [
+					acceptor.accept(declaration.klazz.toClass(declaration.klazz.fullyQualifiedName)) [
 						documentation = declaration.documentation
-						if (declaration.extend != null && declaration.extend.size > 0) {
+						if (declaration.klazz.extend != null && declaration.klazz.extend.size > 0) {
 							// TODO está pegando o primeiro elemento como classe
-							superTypes += declaration.extend.get(0).cloneWithProxies
+							superTypes += declaration.klazz.extend.get(0).cloneWithProxies
 						}
-						for (property : declaration.properties) {
-							members += property.toField(property.name, property.type)
-							members += property.toSetter(property.name, property.type)
-							members += property.toGetter(property.name, property.type)
+						for (p : declaration.klazz.properties) {
+							members += p.property.toField(p.property.name, p.property.type)
+							members += p.property.toSetter(p.property.name, p.property.type)
+							members += p.property.toGetter(p.property.name, p.property.type)
 						}
 						for (entry : ops.entrySet) {
-							if (entry.value.fullyQualifiedName.equals(declaration.fullyQualifiedName)){
+							if (entry.value.fullyQualifiedName.equals(declaration.klazz.fullyQualifiedName)){
 								members += entry.key
 							}
 						}

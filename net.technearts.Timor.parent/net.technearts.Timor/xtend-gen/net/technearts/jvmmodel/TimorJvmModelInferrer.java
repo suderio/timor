@@ -10,9 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import net.technearts.timor.ClassDeclaration;
+import net.technearts.timor.Declaration;
 import net.technearts.timor.File;
+import net.technearts.timor.Method;
 import net.technearts.timor.MethodDeclaration;
 import net.technearts.timor.Property;
+import net.technearts.timor.PropertyDeclaration;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.common.types.JvmField;
@@ -51,17 +54,24 @@ public class TimorJvmModelInferrer extends AbstractModelInferrer {
   
   protected void _infer(final File file, final IJvmDeclaredTypeAcceptor acceptor, final boolean isPreIndexingPhase) {
     final HashMap<JvmOperation, JvmGenericType> ops = new HashMap<JvmOperation, JvmGenericType>();
-    EList<EObject> _declarations = file.getDeclarations();
-    for (final EObject declaration : _declarations) {
+    EList<Declaration> _declarations = file.getDeclarations();
+    for (final Declaration declaration : _declarations) {
       boolean _matched = false;
       if (declaration instanceof MethodDeclaration) {
         _matched=true;
-        String _methodName = ((MethodDeclaration)declaration).getMethodName();
-        JvmTypeReference _type = ((MethodDeclaration)declaration).getType();
+        Method _method = ((MethodDeclaration)declaration).getMethod();
+        String _methodName = _method.getMethodName();
+        Method _method_1 = ((MethodDeclaration)declaration).getMethod();
+        JvmTypeReference _type = _method_1.getType();
         final Procedure1<JvmOperation> _function = (JvmOperation it) -> {
           String _documentation = this._jvmTypesBuilder.getDocumentation(declaration);
           this._jvmTypesBuilder.setDocumentation(it, _documentation);
-          EList<JvmFormalParameter> _params = ((MethodDeclaration)declaration).getParams();
+          Method _method_2 = ((MethodDeclaration)declaration).getMethod();
+          String _scope = _method_2.getScope();
+          boolean _equals = Objects.equal(_scope, "type");
+          it.setStatic(_equals);
+          Method _method_3 = ((MethodDeclaration)declaration).getMethod();
+          EList<JvmFormalParameter> _params = _method_3.getParams();
           for (final JvmFormalParameter p : _params) {
             EList<JvmFormalParameter> _parameters = it.getParameters();
             String _name = p.getName();
@@ -69,49 +79,65 @@ public class TimorJvmModelInferrer extends AbstractModelInferrer {
             JvmFormalParameter _parameter = this._jvmTypesBuilder.toParameter(p, _name, _parameterType);
             this._jvmTypesBuilder.<JvmFormalParameter>operator_add(_parameters, _parameter);
           }
-          XExpression _body = ((MethodDeclaration)declaration).getBody();
+          Method _method_4 = ((MethodDeclaration)declaration).getMethod();
+          XExpression _body = _method_4.getBody();
           this._jvmTypesBuilder.setBody(it, _body);
         };
-        JvmOperation _method = this._jvmTypesBuilder.toMethod(declaration, _methodName, _type, _function);
-        QualifiedName _fullyQualifiedName = this._iQualifiedNameProvider.getFullyQualifiedName(declaration);
-        JvmGenericType _class = this._jvmTypesBuilder.toClass(declaration, _fullyQualifiedName);
-        ops.put(_method, _class);
+        JvmOperation _method_2 = this._jvmTypesBuilder.toMethod(declaration, _methodName, _type, _function);
+        Method _method_3 = ((MethodDeclaration)declaration).getMethod();
+        Method _method_4 = ((MethodDeclaration)declaration).getMethod();
+        QualifiedName _fullyQualifiedName = this._iQualifiedNameProvider.getFullyQualifiedName(_method_4);
+        JvmGenericType _class = this._jvmTypesBuilder.toClass(_method_3, _fullyQualifiedName);
+        ops.put(_method_2, _class);
       }
     }
-    EList<EObject> _declarations_1 = file.getDeclarations();
-    for (final EObject declaration_1 : _declarations_1) {
+    EList<Declaration> _declarations_1 = file.getDeclarations();
+    for (final Declaration declaration_1 : _declarations_1) {
       boolean _matched_1 = false;
       if (declaration_1 instanceof ClassDeclaration) {
         _matched_1=true;
-        QualifiedName _fullyQualifiedName = this._iQualifiedNameProvider.getFullyQualifiedName(declaration_1);
-        JvmGenericType _class = this._jvmTypesBuilder.toClass(declaration_1, _fullyQualifiedName);
+        net.technearts.timor.Class _klazz = ((ClassDeclaration)declaration_1).getKlazz();
+        net.technearts.timor.Class _klazz_1 = ((ClassDeclaration)declaration_1).getKlazz();
+        QualifiedName _fullyQualifiedName = this._iQualifiedNameProvider.getFullyQualifiedName(_klazz_1);
+        JvmGenericType _class = this._jvmTypesBuilder.toClass(_klazz, _fullyQualifiedName);
         final Procedure1<JvmGenericType> _function = (JvmGenericType it) -> {
           String _documentation = this._jvmTypesBuilder.getDocumentation(declaration_1);
           this._jvmTypesBuilder.setDocumentation(it, _documentation);
-          if (((!Objects.equal(((ClassDeclaration)declaration_1).getExtend(), null)) && (((ClassDeclaration)declaration_1).getExtend().size() > 0))) {
+          if (((!Objects.equal(((ClassDeclaration)declaration_1).getKlazz().getExtend(), null)) && (((ClassDeclaration)declaration_1).getKlazz().getExtend().size() > 0))) {
             EList<JvmTypeReference> _superTypes = it.getSuperTypes();
-            EList<JvmTypeReference> _extend = ((ClassDeclaration)declaration_1).getExtend();
+            net.technearts.timor.Class _klazz_2 = ((ClassDeclaration)declaration_1).getKlazz();
+            EList<JvmTypeReference> _extend = _klazz_2.getExtend();
             JvmTypeReference _get = _extend.get(0);
             JvmTypeReference _cloneWithProxies = this._jvmTypesBuilder.cloneWithProxies(_get);
             this._jvmTypesBuilder.<JvmTypeReference>operator_add(_superTypes, _cloneWithProxies);
           }
-          EList<Property> _properties = ((ClassDeclaration)declaration_1).getProperties();
-          for (final Property property : _properties) {
+          net.technearts.timor.Class _klazz_3 = ((ClassDeclaration)declaration_1).getKlazz();
+          EList<PropertyDeclaration> _properties = _klazz_3.getProperties();
+          for (final PropertyDeclaration p : _properties) {
             {
               EList<JvmMember> _members = it.getMembers();
-              String _name = property.getName();
-              JvmTypeReference _type = property.getType();
-              JvmField _field = this._jvmTypesBuilder.toField(property, _name, _type);
+              Property _property = p.getProperty();
+              Property _property_1 = p.getProperty();
+              String _name = _property_1.getName();
+              Property _property_2 = p.getProperty();
+              JvmTypeReference _type = _property_2.getType();
+              JvmField _field = this._jvmTypesBuilder.toField(_property, _name, _type);
               this._jvmTypesBuilder.<JvmField>operator_add(_members, _field);
               EList<JvmMember> _members_1 = it.getMembers();
-              String _name_1 = property.getName();
-              JvmTypeReference _type_1 = property.getType();
-              JvmOperation _setter = this._jvmTypesBuilder.toSetter(property, _name_1, _type_1);
+              Property _property_3 = p.getProperty();
+              Property _property_4 = p.getProperty();
+              String _name_1 = _property_4.getName();
+              Property _property_5 = p.getProperty();
+              JvmTypeReference _type_1 = _property_5.getType();
+              JvmOperation _setter = this._jvmTypesBuilder.toSetter(_property_3, _name_1, _type_1);
               this._jvmTypesBuilder.<JvmOperation>operator_add(_members_1, _setter);
               EList<JvmMember> _members_2 = it.getMembers();
-              String _name_2 = property.getName();
-              JvmTypeReference _type_2 = property.getType();
-              JvmOperation _getter = this._jvmTypesBuilder.toGetter(property, _name_2, _type_2);
+              Property _property_6 = p.getProperty();
+              Property _property_7 = p.getProperty();
+              String _name_2 = _property_7.getName();
+              Property _property_8 = p.getProperty();
+              JvmTypeReference _type_2 = _property_8.getType();
+              JvmOperation _getter = this._jvmTypesBuilder.toGetter(_property_6, _name_2, _type_2);
               this._jvmTypesBuilder.<JvmOperation>operator_add(_members_2, _getter);
             }
           }
@@ -119,7 +145,8 @@ public class TimorJvmModelInferrer extends AbstractModelInferrer {
           for (final Map.Entry<JvmOperation, JvmGenericType> entry : _entrySet) {
             JvmGenericType _value = entry.getValue();
             QualifiedName _fullyQualifiedName_1 = this._iQualifiedNameProvider.getFullyQualifiedName(_value);
-            QualifiedName _fullyQualifiedName_2 = this._iQualifiedNameProvider.getFullyQualifiedName(declaration_1);
+            net.technearts.timor.Class _klazz_4 = ((ClassDeclaration)declaration_1).getKlazz();
+            QualifiedName _fullyQualifiedName_2 = this._iQualifiedNameProvider.getFullyQualifiedName(_klazz_4);
             boolean _equals = _fullyQualifiedName_1.equals(_fullyQualifiedName_2);
             if (_equals) {
               EList<JvmMember> _members = it.getMembers();
