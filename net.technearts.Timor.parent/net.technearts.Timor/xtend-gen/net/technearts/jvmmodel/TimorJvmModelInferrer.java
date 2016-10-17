@@ -3,35 +3,15 @@
  */
 package net.technearts.jvmmodel;
 
-import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import net.technearts.timor.ClassDeclaration;
-import net.technearts.timor.Declaration;
 import net.technearts.timor.File;
-import net.technearts.timor.Method;
-import net.technearts.timor.MethodDeclaration;
-import net.technearts.timor.Property;
-import net.technearts.timor.PropertyDeclaration;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.common.types.JvmField;
-import org.eclipse.xtext.common.types.JvmFormalParameter;
-import org.eclipse.xtext.common.types.JvmGenericType;
-import org.eclipse.xtext.common.types.JvmMember;
-import org.eclipse.xtext.common.types.JvmOperation;
-import org.eclipse.xtext.common.types.JvmTypeReference;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
-import org.eclipse.xtext.naming.QualifiedName;
-import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer;
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor;
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder;
 import org.eclipse.xtext.xbase.lib.Extension;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 /**
  * <p>Infers a JVM model from the source model.</p>
@@ -53,111 +33,85 @@ public class TimorJvmModelInferrer extends AbstractModelInferrer {
   private IQualifiedNameProvider _iQualifiedNameProvider;
   
   protected void _infer(final File file, final IJvmDeclaredTypeAcceptor acceptor, final boolean isPreIndexingPhase) {
-    final HashMap<JvmOperation, JvmGenericType> ops = new HashMap<JvmOperation, JvmGenericType>();
-    EList<Declaration> _declarations = file.getDeclarations();
-    for (final Declaration declaration : _declarations) {
-      boolean _matched = false;
-      if (declaration instanceof MethodDeclaration) {
-        _matched=true;
-        Method _method = ((MethodDeclaration)declaration).getMethod();
-        String _methodName = _method.getMethodName();
-        Method _method_1 = ((MethodDeclaration)declaration).getMethod();
-        JvmTypeReference _type = _method_1.getType();
-        final Procedure1<JvmOperation> _function = (JvmOperation it) -> {
-          String _documentation = this._jvmTypesBuilder.getDocumentation(declaration);
-          this._jvmTypesBuilder.setDocumentation(it, _documentation);
-          Method _method_2 = ((MethodDeclaration)declaration).getMethod();
-          String _scope = _method_2.getScope();
-          boolean _equals = Objects.equal(_scope, "type");
-          it.setStatic(_equals);
-          Method _method_3 = ((MethodDeclaration)declaration).getMethod();
-          EList<JvmFormalParameter> _params = _method_3.getParams();
-          for (final JvmFormalParameter p : _params) {
-            EList<JvmFormalParameter> _parameters = it.getParameters();
-            String _name = p.getName();
-            JvmTypeReference _parameterType = p.getParameterType();
-            JvmFormalParameter _parameter = this._jvmTypesBuilder.toParameter(p, _name, _parameterType);
-            this._jvmTypesBuilder.<JvmFormalParameter>operator_add(_parameters, _parameter);
-          }
-          Method _method_4 = ((MethodDeclaration)declaration).getMethod();
-          XExpression _body = _method_4.getBody();
-          this._jvmTypesBuilder.setBody(it, _body);
-        };
-        JvmOperation _method_2 = this._jvmTypesBuilder.toMethod(declaration, _methodName, _type, _function);
-        Method _method_3 = ((MethodDeclaration)declaration).getMethod();
-        Method _method_4 = ((MethodDeclaration)declaration).getMethod();
-        QualifiedName _fullyQualifiedName = this._iQualifiedNameProvider.getFullyQualifiedName(_method_4);
-        JvmGenericType _class = this._jvmTypesBuilder.toClass(_method_3, _fullyQualifiedName);
-        ops.put(_method_2, _class);
-      }
-    }
-    EList<Declaration> _declarations_1 = file.getDeclarations();
-    for (final Declaration declaration_1 : _declarations_1) {
-      boolean _matched_1 = false;
-      if (declaration_1 instanceof ClassDeclaration) {
-        _matched_1=true;
-        net.technearts.timor.Class _klazz = ((ClassDeclaration)declaration_1).getKlazz();
-        net.technearts.timor.Class _klazz_1 = ((ClassDeclaration)declaration_1).getKlazz();
-        QualifiedName _fullyQualifiedName = this._iQualifiedNameProvider.getFullyQualifiedName(_klazz_1);
-        JvmGenericType _class = this._jvmTypesBuilder.toClass(_klazz, _fullyQualifiedName);
-        final Procedure1<JvmGenericType> _function = (JvmGenericType it) -> {
-          String _documentation = this._jvmTypesBuilder.getDocumentation(declaration_1);
-          this._jvmTypesBuilder.setDocumentation(it, _documentation);
-          if (((!Objects.equal(((ClassDeclaration)declaration_1).getKlazz().getExtend(), null)) && (((ClassDeclaration)declaration_1).getKlazz().getExtend().size() > 0))) {
-            EList<JvmTypeReference> _superTypes = it.getSuperTypes();
-            net.technearts.timor.Class _klazz_2 = ((ClassDeclaration)declaration_1).getKlazz();
-            EList<JvmTypeReference> _extend = _klazz_2.getExtend();
-            JvmTypeReference _get = _extend.get(0);
-            JvmTypeReference _cloneWithProxies = this._jvmTypesBuilder.cloneWithProxies(_get);
-            this._jvmTypesBuilder.<JvmTypeReference>operator_add(_superTypes, _cloneWithProxies);
-          }
-          net.technearts.timor.Class _klazz_3 = ((ClassDeclaration)declaration_1).getKlazz();
-          EList<PropertyDeclaration> _properties = _klazz_3.getProperties();
-          for (final PropertyDeclaration p : _properties) {
-            {
-              EList<JvmMember> _members = it.getMembers();
-              Property _property = p.getProperty();
-              Property _property_1 = p.getProperty();
-              String _name = _property_1.getName();
-              Property _property_2 = p.getProperty();
-              JvmTypeReference _type = _property_2.getType();
-              JvmField _field = this._jvmTypesBuilder.toField(_property, _name, _type);
-              this._jvmTypesBuilder.<JvmField>operator_add(_members, _field);
-              EList<JvmMember> _members_1 = it.getMembers();
-              Property _property_3 = p.getProperty();
-              Property _property_4 = p.getProperty();
-              String _name_1 = _property_4.getName();
-              Property _property_5 = p.getProperty();
-              JvmTypeReference _type_1 = _property_5.getType();
-              JvmOperation _setter = this._jvmTypesBuilder.toSetter(_property_3, _name_1, _type_1);
-              this._jvmTypesBuilder.<JvmOperation>operator_add(_members_1, _setter);
-              EList<JvmMember> _members_2 = it.getMembers();
-              Property _property_6 = p.getProperty();
-              Property _property_7 = p.getProperty();
-              String _name_2 = _property_7.getName();
-              Property _property_8 = p.getProperty();
-              JvmTypeReference _type_2 = _property_8.getType();
-              JvmOperation _getter = this._jvmTypesBuilder.toGetter(_property_6, _name_2, _type_2);
-              this._jvmTypesBuilder.<JvmOperation>operator_add(_members_2, _getter);
-            }
-          }
-          Set<Map.Entry<JvmOperation, JvmGenericType>> _entrySet = ops.entrySet();
-          for (final Map.Entry<JvmOperation, JvmGenericType> entry : _entrySet) {
-            JvmGenericType _value = entry.getValue();
-            QualifiedName _fullyQualifiedName_1 = this._iQualifiedNameProvider.getFullyQualifiedName(_value);
-            net.technearts.timor.Class _klazz_4 = ((ClassDeclaration)declaration_1).getKlazz();
-            QualifiedName _fullyQualifiedName_2 = this._iQualifiedNameProvider.getFullyQualifiedName(_klazz_4);
-            boolean _equals = _fullyQualifiedName_1.equals(_fullyQualifiedName_2);
-            if (_equals) {
-              EList<JvmMember> _members = it.getMembers();
-              JvmOperation _key = entry.getKey();
-              this._jvmTypesBuilder.<JvmOperation>operator_add(_members, _key);
-            }
-          }
-        };
-        acceptor.<JvmGenericType>accept(_class, _function);
-      }
-    }
+    throw new Error("Unresolved compilation problems:"
+      + "\nMethodDeclaration cannot be resolved to a type."
+      + "\nClassDeclaration cannot be resolved to a type."
+      + "\nThe method or field declarations is undefined for the type File"
+      + "\nThe method static(Object) is undefined"
+      + "\nThe method or field parameters is undefined"
+      + "\nThe method or field declarations is undefined for the type File"
+      + "\nThe method or field superTypes is undefined"
+      + "\nThe method or field members is undefined"
+      + "\nThe method or field members is undefined"
+      + "\nThe method or field members is undefined"
+      + "\nThe method or field members is undefined"
+      + "\nType mismatch: cannot convert implicit first argument from JvmIdentifiableElement to JvmExecutable"
+      + "\nType mismatch: cannot convert implicit first argument from TimorJvmModelInferrer to JvmIdentifiableElement"
+      + "\ntoMethod cannot be resolved"
+      + "\nmethod cannot be resolved"
+      + "\nmethodName cannot be resolved"
+      + "\nmethod cannot be resolved"
+      + "\ntype cannot be resolved"
+      + "\ndocumentation cannot be resolved"
+      + "\nmethod cannot be resolved"
+      + "\nscope cannot be resolved"
+      + "\n== cannot be resolved"
+      + "\nmethod cannot be resolved"
+      + "\nparams cannot be resolved"
+      + "\n+= cannot be resolved"
+      + "\ntoParameter cannot be resolved"
+      + "\nname cannot be resolved"
+      + "\nparameterType cannot be resolved"
+      + "\nmethod cannot be resolved"
+      + "\nbody cannot be resolved"
+      + "\nmethod cannot be resolved"
+      + "\ntoClass cannot be resolved"
+      + "\nmethod cannot be resolved"
+      + "\nfullyQualifiedName cannot be resolved"
+      + "\nklazz cannot be resolved"
+      + "\ntoClass cannot be resolved"
+      + "\nklazz cannot be resolved"
+      + "\nfullyQualifiedName cannot be resolved"
+      + "\ndocumentation cannot be resolved"
+      + "\nklazz cannot be resolved"
+      + "\nextend cannot be resolved"
+      + "\n!= cannot be resolved"
+      + "\n&& cannot be resolved"
+      + "\nklazz cannot be resolved"
+      + "\nextend cannot be resolved"
+      + "\nsize cannot be resolved"
+      + "\n> cannot be resolved"
+      + "\n+= cannot be resolved"
+      + "\nklazz cannot be resolved"
+      + "\nextend cannot be resolved"
+      + "\nget cannot be resolved"
+      + "\ncloneWithProxies cannot be resolved"
+      + "\nklazz cannot be resolved"
+      + "\nproperties cannot be resolved"
+      + "\n+= cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\ntoField cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\nname cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\ntype cannot be resolved"
+      + "\n+= cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\ntoSetter cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\nname cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\ntype cannot be resolved"
+      + "\n+= cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\ntoGetter cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\nname cannot be resolved"
+      + "\nproperty cannot be resolved"
+      + "\ntype cannot be resolved"
+      + "\nklazz cannot be resolved"
+      + "\nfullyQualifiedName cannot be resolved"
+      + "\n+= cannot be resolved");
   }
   
   public void infer(final EObject file, final IJvmDeclaredTypeAcceptor acceptor, final boolean isPreIndexingPhase) {

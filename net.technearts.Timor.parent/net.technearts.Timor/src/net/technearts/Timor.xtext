@@ -6,26 +6,23 @@ File:
 	imports=XImportSection?
 	'package' name=Xtype::QualifiedName
 	(BEGIN
-		(declarations+=(MethodDeclaration | ClassDeclaration))+
+		(classes+=(Class))+
+	END)?
+	(BEGIN
+		(methods+=(Method))+
 	END)?;
-
-Declaration:
-	ClassDeclaration | MethodDeclaration | PropertyDeclaration;
-
-ClassDeclaration:
-	{ClassDeclaration}
-	klazz=(Class);
 
 Class:
 	name=ValidID
 	('is' extend+=(JvmTypeReference)+)?
-	'{' 
-		(properties+=(PropertyDeclaration))+
-	 '}';
+	//'{' 
+	(BEGIN
+		(properties+=(Property))+
+	 //'}';
+	 END)?;
 
-MethodDeclaration:
-	{MethodDeclaration}
-	method=(Method);
+Property:
+	name=ValidID ':' type=JvmTypeReference;
 
 Method:
 	type=JvmTypeReference
@@ -34,16 +31,8 @@ Method:
 	(',' params+=FullJvmFormalParameter)*) ')'
 	body=XBlockExpression;
 
-PropertyDeclaration:
-	{PropertyDeclaration}
-	property=(Property);
-
-Property:
-	name=ValidID ':' type=JvmTypeReference;
-
 terminal SCOPE:
 	'self' | 'type';
-
 terminal BEGIN:
 	'synthetic:BEGIN'; // increase indentation
 terminal END:

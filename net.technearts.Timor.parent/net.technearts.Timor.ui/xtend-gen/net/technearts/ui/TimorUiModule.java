@@ -13,7 +13,7 @@ import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor;
 @FinalFieldsConstructor
 @SuppressWarnings("all")
 public class TimorUiModule extends AbstractTimorUiModule {
-  public TimorUiModule(final AbstractUIPlugin arg0) {
-    super(arg0);
+  public TimorUiModule(final AbstractUIPlugin plugin) {
+    super(plugin);
   }
 }
