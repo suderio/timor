@@ -20,7 +20,10 @@ local.properties
 .classpath
 .settings/
 .loadpath
+# xtext
 src-gen/
+xtend-gen/
+model/generated/
 # External tool builders
 .externalToolBuilders/
 
