@@ -1,6 +1,7 @@
 module net.technearts.GenerateTimor
 
 import org.eclipse.xtext.xtext.generator.*
+import org.eclipse.xtext.xtext.generator.parser.antlr.*
 import org.eclipse.xtext.xtext.generator.model.project.*
 
 var rootPath = ".."

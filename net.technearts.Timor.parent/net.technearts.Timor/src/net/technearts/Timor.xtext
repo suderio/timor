@@ -4,10 +4,12 @@ generate timor "http://www.technearts.net/Timor"
 
 File:
 	imports=XImportSection?
-	'package' name=Xtype::QualifiedName
+	'package' ':' name=Xtype::QualifiedName
+	'types' ':'
 	(BEGIN
 		(classes+=(Class))+
 	END)?
+	'functions' ':'
 	(BEGIN
 		(methods+=(Method))+
 	END)?;
@@ -24,11 +26,17 @@ Class:
 Property:
 	name=ValidID ':' type=JvmTypeReference;
 
+XBlockExpression returns XExpression: 
+    {XBlockExpression}
+    BEGIN
+        (expressions+=XExpressionOrVarDeclaration ';'?)*
+    END;
+    
 Method:
-	type=JvmTypeReference
 	methodName=ValidID
 	'(' (name=ValidID scope=SCOPE
 	(',' params+=FullJvmFormalParameter)*) ')'
+	':' type=JvmTypeReference
 	body=XBlockExpression;
 
 terminal SCOPE:

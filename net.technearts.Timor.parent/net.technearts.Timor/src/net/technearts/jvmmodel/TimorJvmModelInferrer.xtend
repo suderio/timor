@@ -5,9 +5,7 @@ package net.technearts.jvmmodel
 
 import com.google.inject.Inject
 import java.util.HashMap
-import net.technearts.timor.ClassDeclaration
 import net.technearts.timor.File
-import net.technearts.timor.MethodDeclaration
 import org.eclipse.xtext.common.types.JvmGenericType
 import org.eclipse.xtext.common.types.JvmOperation
 import org.eclipse.xtext.naming.IQualifiedNameProvider
@@ -31,42 +29,34 @@ class TimorJvmModelInferrer extends AbstractModelInferrer {
 
 	def dispatch void infer(File file, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
 		val ops = new HashMap<JvmOperation, JvmGenericType>();
-		for (declaration : file.declarations) {
-			switch declaration {
-				MethodDeclaration: {
-					ops.put( declaration.toMethod(declaration.method.methodName, declaration.method.type) [
-						documentation = declaration.documentation
-						static = declaration.method.scope == 'type'
-						for (p : declaration.method.params) {
-							parameters += p.toParameter(p.name, p.parameterType)
-						}
-						body = declaration.method.body
-					], declaration.method.toClass(declaration.method.fullyQualifiedName))
+		for (method : file.methods) {
+			ops.put( method.toMethod(method.methodName, method.type) [
+				documentation = method.documentation
+				static = method.scope == 'type'
+				for (p : method.params) {
+					parameters += p.toParameter(p.name, p.parameterType)
 				}
-			}
+				body = method.body
+			], method.toClass(method.fullyQualifiedName))
 		}
-		for (declaration : file.declarations) {
-			switch declaration {
-				ClassDeclaration: {
-					acceptor.accept(declaration.klazz.toClass(declaration.klazz.fullyQualifiedName)) [
-						documentation = declaration.documentation
-						if (declaration.klazz.extend != null && declaration.klazz.extend.size > 0) {
-							// TODO está pegando o primeiro elemento como classe
-							superTypes += declaration.klazz.extend.get(0).cloneWithProxies
-						}
-						for (p : declaration.klazz.properties) {
-							members += p.property.toField(p.property.name, p.property.type)
-							members += p.property.toSetter(p.property.name, p.property.type)
-							members += p.property.toGetter(p.property.name, p.property.type)
-						}
-						for (entry : ops.entrySet) {
-							if (entry.value.fullyQualifiedName.equals(declaration.klazz.fullyQualifiedName)){
-								members += entry.key
-							}
-						}
-					]
+		for (klazz : file.classes) {
+			acceptor.accept(klazz.toClass(klazz.fullyQualifiedName)) [
+				documentation = klazz.documentation
+				if (klazz.extend != null && klazz.extend.size > 0) {
+					// TODO está pegando o primeiro elemento como classe
+					superTypes += klazz.extend.get(0).cloneWithProxies
 				}
-			}
+				for (p : klazz.properties) {
+					members += p.toField(p.name, p.type)
+					members += p.toSetter(p.name, p.type)
+					members += p.toGetter(p.name, p.type)
+				}
+				for (entry : ops.entrySet) {
+					if (entry.value.fullyQualifiedName.equals(klazz.fullyQualifiedName)){
+						members += entry.key
+					}
+				}
+			]
 		}
 	}
 }
